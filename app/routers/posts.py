@@ -12,7 +12,6 @@ def posts_page():
     
     posts_html = ""
     for post in posts:
-        # Находим имя автора
         author_name = "Неизвестный автор"
         for user in users:
             if user["id"] == post["author_id"]:
@@ -347,7 +346,6 @@ def create_post_api(title: str, content: str, author_id: int):
     posts = read_data("posts.json")
     users = read_data("users.json")
     
-    # Проверяем существование автора
     author_exists = any(user["id"] == author_id for user in users)
     if not author_exists:
         return {"error": "Автор не найден"}, 400
