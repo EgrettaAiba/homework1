@@ -15,7 +15,6 @@ def posts_page():
 
     posts_html = ""
     for post in posts:
-        # Находим имя автора
         author_name = "Неизвестный автор"
         for user in users:
             if user["id"] == post["author_id"]:
