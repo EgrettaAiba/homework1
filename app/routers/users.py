@@ -1,14 +1,17 @@
+from datetime import datetime
+
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
-from datetime import datetime
+
 from app.database import read_data, save_data
 
 router = APIRouter()
 
+
 @router.get("/users")
 def users_page():
     users = read_data("users.json")
-    
+
     users_html = ""
     for user in users:
         users_html += f"""
@@ -20,8 +23,9 @@ def users_page():
             </div>
         </div>
         """
-    
-    return HTMLResponse(f"""
+
+    return HTMLResponse(
+        f"""
     <!DOCTYPE html>
     <html lang="ru">
     <head>
@@ -35,7 +39,9 @@ def users_page():
                 font-family: 'Arial', sans-serif;
                 background-color: #687d31;
                 min-height: 100vh;
-                background-image: url('https://i.pinimg.com/1200x/61/94/58/61945810e068dbcc17ac4818134327de.jpg');
+                background-image: url(
+                    'https://i.pinimg.com/1200x/61/94/58/61945810e068dbcc17ac4818134327de.jpg'
+                );
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
@@ -179,24 +185,32 @@ def users_page():
         <div class="overlay"></div>
         <div class="container">
             <a href="/" class="back-link">← Назад на главную</a>
-            
+
             <div class="content-box">
                 <h1>👥 Управление пользователями</h1>
-                
+
                 <div class="create-form">
                     <h3>Создать нового пользователя</h3>
                     <div class="form-group">
-                        <input type="text" id="username" class="form-input" placeholder="Введите имя пользователя">
+                        <input type="text" id="username" class="form-input"
+                               placeholder="Введите имя пользователя">
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" class="form-input" placeholder="Введите email">
+                        <input type="email" id="email" class="form-input"
+                               placeholder="Введите email">
                     </div>
-                    <button class="submit-btn" onclick="createUser()">Создать пользователя</button>
+                    <button class="submit-btn" onclick="createUser()">
+                        Создать пользователя
+                    </button>
                 </div>
 
                 <h3>Список пользователей:</h3>
                 <div class="users-list">
-                    {users_html if users_html else '<div class="empty-state">😔 Пользователей пока нет</div>'}
+                    {
+                        users_html
+                        if users_html
+                        else '<div class="empty-state">😔 Пользователей пока нет</div>'
+                    }
                 </div>
             </div>
         </div>
@@ -205,16 +219,20 @@ def users_page():
             async function createUser() {{
                 const username = document.getElementById('username').value;
                 const email = document.getElementById('email').value;
-                
+
                 if (!username || !email) {{
                     alert('Пожалуйста, заполните все поля');
                     return;
                 }}
 
-                const response = await fetch('/api/users?username=' + encodeURIComponent(username) + '&email=' + encodeURIComponent(email), {{
-                    method: 'POST'
-                }});
-                
+                const response = await fetch(
+                    '/api/users?username=' + encodeURIComponent(username) +
+                    '&email=' + encodeURIComponent(email),
+                    {{
+                        method: 'POST'
+                    }}
+                );
+
                 if (response.ok) {{
                     alert('Пользователь успешно создан!');
                     location.reload();
@@ -225,30 +243,34 @@ def users_page():
 
             // Добавляем обработчик нажатия Enter
             document.addEventListener('DOMContentLoaded', function() {{
-                document.getElementById('username').addEventListener('keypress', function(e) {{
+                document.getElementById('username').addEventListener(
+                    'keypress', function(e) {{
                     if (e.key === 'Enter') createUser();
                 }});
-                document.getElementById('email').addEventListener('keypress', function(e) {{
+                document.getElementById('email').addEventListener(
+                    'keypress', function(e) {{
                     if (e.key === 'Enter') createUser();
                 }});
             }});
         </script>
     </body>
     </html>
-    """)
+    """
+    )
+
 
 @router.post("/api/users")
 def create_user_api(username: str, email: str):
     users = read_data("users.json")
-    
+
     new_user = {
         "id": len(users) + 1,
         "username": username,
         "email": email,
-        "created_at": datetime.now().isoformat()
+        "created_at": datetime.now().isoformat(),
     }
-    
+
     users.append(new_user)
     save_data("users.json", users)
-    
+
     return {"message": "Пользователь создан"}
